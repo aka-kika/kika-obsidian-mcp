@@ -1,7 +1,7 @@
 [project]
 name = "obsidian-mcp-codex"
 version = "0.1.0"
-description = "Local-first MCP server for Obsidian vaults, built for Codex and filesystem-based markdown workflows."
+description = "Local-first MCP server for Obsidian vaults, built for Codex, Claude Desktop, and filesystem-based markdown workflows."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -13,9 +13,18 @@ dependencies = [
   "pyyaml",
   "python-frontmatter"
 ]
-keywords = ["mcp", "model-context-protocol", "obsidian", "codex", "markdown"]
+keywords = [
+  "mcp",
+  "model-context-protocol",
+  "obsidian",
+  "obsidian-mcp",
+  "codex",
+  "claude-desktop",
+  "markdown",
+  "local-first",
+  "knowledge-base"
+]
 
 [project.urls]
 Homepage = "https://github.com/dot-RealityTest/obsidian-codex-mcp"
 Repository = "https://github.com/dot-RealityTest/obsidian-codex-mcp"
-

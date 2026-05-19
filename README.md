@@ -1,8 +1,15 @@
-# Obsidian MCP for Codex
+# Obsidian Codex MCP
 
-A local-first Model Context Protocol server for Obsidian vaults.
+A local-first Model Context Protocol server for Obsidian vaults, built for Codex and other MCP clients.
 
-This server gives MCP clients such as Codex, Claude Desktop, Cline, and other agent tools structured access to markdown notes on disk. It does not require an Obsidian plugin, an API key, or a running Obsidian app. Point it at a vault folder and it reads/writes markdown files directly.
+Obsidian Codex MCP lets AI coding agents and desktop assistants read, search, create, update, and organize Obsidian markdown notes through MCP. It does not require an Obsidian plugin, an API key, or a running Obsidian app. Point it at a vault folder and it works directly with local markdown files.
+
+## Best for
+
+- Codex users who want safe local access to an Obsidian vault
+- Claude Desktop, Cline, Cursor, and other MCP clients that can run a local Python server
+- Developers who prefer filesystem-based Obsidian automation over the Local REST API plugin
+- Personal knowledge bases, project logs, daily notes, task notes, and markdown-first workflows
 
 ## Why this exists
 
@@ -16,6 +23,18 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 - path traversal protection so tools cannot escape the configured vault
 - optional read-only mode for safer review/search workflows
 - optional backup-on-write before updates and deletes
+
+## How it compares
+
+| Need | This project |
+| --- | --- |
+| Use Obsidian with Codex | Yes, with `~/.codex/config.toml` examples |
+| Use Obsidian with Claude Desktop | Yes, with JSON config examples |
+| Require an Obsidian plugin | No |
+| Require an API key | No |
+| Require Obsidian to be open | No |
+| Read/write markdown files directly | Yes |
+| Work over a remote HTTP API | No, local stdio MCP only |
 
 ## Tools
 
@@ -154,6 +173,28 @@ skills/obsidian-vault-workflow/SKILL.md
 ```
 
 Use it as guidance for agents that work with this MCP server. It covers safe vault exploration, editing discipline, daily status reports, vault triage, and project catch-up prompts.
+
+## FAQ
+
+### Is this an Obsidian MCP server?
+
+Yes. It is a local MCP server for Obsidian vaults. It exposes tools for notes, tags, backlinks, wikilinks, folders, search, and optional writes.
+
+### Does it work with Codex?
+
+Yes. The main setup path is Codex-first and uses `~/.codex/config.toml`.
+
+### Does it need the Obsidian Local REST API plugin?
+
+No. It reads and writes markdown files directly from the vault folder.
+
+### Does Obsidian need to be running?
+
+No. Because this server works on local files, Obsidian does not need to be open.
+
+### Can I make it read-only?
+
+Yes. Set `OBSIDIAN_READ_ONLY=true` to allow search and inspection while refusing create, update, delete, and folder creation tools.
 
 ## Current limitations
 

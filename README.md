@@ -166,13 +166,14 @@ The script reports recent notes, markdown checkbox tasks, and top tags. It uses 
 
 ## Optional skill
 
-This repo includes a lightweight agent workflow skill:
+This repo includes lightweight agent workflow skills:
 
 ```text
 skills/obsidian-vault-workflow/SKILL.md
+skills/release-note-captain/SKILL.md
 ```
 
-Use it as guidance for agents that work with this MCP server. It covers safe vault exploration, editing discipline, daily status reports, vault triage, and project catch-up prompts.
+Use them as guidance for agents that work with this MCP server. They cover safe vault exploration, editing discipline, daily status reports, vault triage, project catch-up prompts, and release-note capture after a project ships.
 
 ## FAQ
 

@@ -24,7 +24,10 @@ jobs:
         run: python -m py_compile server.py obsidian_client.py test_server.py
 
       - name: Check skill file
-        run: test -f skills/obsidian-vault-workflow/SKILL.md
+        run: |
+          test -f skills/obsidian-vault-workflow/SKILL.md
+          test -f skills/release-note-captain/SKILL.md
+          test -f skills/release-note-captain/templates/release-note.md
 
       - name: Build test vault
         run: |

@@ -177,6 +177,10 @@ See [docs/common-workflows.md](docs/common-workflows.md) for practical examples:
 - finding underlinked notes
 - safe editing checklist
 
+## Share and submit
+
+See [docs/share-and-submit.md](docs/share-and-submit.md) for directory targets, Obsidian community links, and ready-to-post copy.
+
 ## Optional skill
 
 This repo includes lightweight agent workflow skills:

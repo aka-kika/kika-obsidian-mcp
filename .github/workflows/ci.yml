@@ -28,6 +28,7 @@ jobs:
           test -f docs/common-workflows.md
           test -f docs/templates/codex-work-log.md
           test -f docs/templates/project-session-log.md
+          test -f docs/templates/weekly-review.md
           test -f skills/obsidian-vault-workflow/SKILL.md
           test -f skills/release-note-captain/SKILL.md
           test -f skills/release-note-captain/templates/release-note.md

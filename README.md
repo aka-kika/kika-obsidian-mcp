@@ -183,6 +183,7 @@ Copyable Obsidian note templates live in [docs/templates](docs/templates):
 
 - [Codex work log](docs/templates/codex-work-log.md) for daily project status and workstream summaries
 - [Project session log](docs/templates/project-session-log.md) for per-project session notes, decisions, links, and next moves
+- [Weekly review](docs/templates/weekly-review.md) for accomplishments, open loops, and next-week priorities
 
 ## Optional skill
 

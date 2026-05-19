@@ -177,6 +177,13 @@ See [docs/common-workflows.md](docs/common-workflows.md) for practical examples:
 - finding underlinked notes
 - safe editing checklist
 
+## Templates
+
+Copyable Obsidian note templates live in [docs/templates](docs/templates):
+
+- [Codex work log](docs/templates/codex-work-log.md) for daily project status and workstream summaries
+- [Project session log](docs/templates/project-session-log.md) for per-project session notes, decisions, links, and next moves
+
 ## Optional skill
 
 This repo includes lightweight agent workflow skills:

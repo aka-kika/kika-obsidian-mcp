@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Syntax check
+        run: python -m py_compile server.py obsidian_client.py test_server.py
+
+      - name: Check skill file
+        run: test -f skills/obsidian-vault-workflow/SKILL.md
+
+      - name: Build test vault
+        run: |
+          mkdir -p test-vault/Notes
+          printf '%s\n' '---' 'title: Welcome' 'tags:' '  - mcp' '  - obsidian' '---' '' '# Welcome' '' 'This is a test note with a link to [[Second Note]].' > test-vault/Notes/Welcome.md
+          printf '%s\n' '# Second Note' '' '#linked' > "test-vault/Notes/Second Note.md"
+
+      - name: Run tests
+        env:
+          OBSIDIAN_VAULT_PATH: ${{ github.workspace }}/test-vault
+        run: python test_server.py
+
+      - name: Run automation script
+        env:
+          OBSIDIAN_VAULT_PATH: ${{ github.workspace }}/test-vault
+        run: python scripts/daily_status_report.py --folder Notes --limit 5

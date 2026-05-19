@@ -1,0 +1,21 @@
+[project]
+name = "obsidian-mcp-codex"
+version = "0.1.0"
+description = "Local-first MCP server for Obsidian vaults, built for Codex and filesystem-based markdown workflows."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Nica Loren" }
+]
+dependencies = [
+  "mcp[cli]",
+  "pyyaml",
+  "python-frontmatter"
+]
+keywords = ["mcp", "model-context-protocol", "obsidian", "codex", "markdown"]
+
+[project.urls]
+Homepage = "https://github.com/kika-hub/obsidian-codex-mcp"
+Repository = "https://github.com/kika-hub/obsidian-codex-mcp"
+

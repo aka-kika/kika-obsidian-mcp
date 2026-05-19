@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "/absolute/path/to/obsidian-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/obsidian-mcp/server.py"],
+      "env": {
+        "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian-vault",
+        "OBSIDIAN_READ_ONLY": "false",
+        "OBSIDIAN_BACKUP_ON_WRITE": "false"
+      }
+    }
+  }
+}

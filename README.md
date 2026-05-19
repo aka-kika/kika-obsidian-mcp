@@ -1,5 +1,13 @@
 # Obsidian Codex MCP
 
+[![CI](https://github.com/dot-RealityTest/obsidian-codex-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/dot-RealityTest/obsidian-codex-mcp/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-111827)](https://modelcontextprotocol.io/)
+[![Obsidian](https://img.shields.io/badge/Obsidian-vaults-7C3AED?logo=obsidian&logoColor=white)](https://obsidian.md/)
+[![Codex](https://img.shields.io/badge/Codex-ready-111827?logo=openai&logoColor=white)](https://openai.com/codex/)
+[![Local first](https://img.shields.io/badge/local--first-markdown-10B981)](#safety-features)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Local-first MCP server for working with an Obsidian vault.
 
 - No Obsidian plugin required

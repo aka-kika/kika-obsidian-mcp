@@ -164,6 +164,19 @@ OBSIDIAN_VAULT_PATH="/absolute/path/to/your/vault" .venv/bin/python scripts/dail
 
 The script reports recent notes, markdown checkbox tasks, and top tags. It uses backup-on-write when updating an existing report note.
 
+## Common workflows
+
+See [docs/common-workflows.md](docs/common-workflows.md) for practical examples:
+
+- safe vault exploration
+- project catch-up
+- daily status reports
+- release notes after shipping
+- vault triage
+- index note creation
+- finding underlinked notes
+- safe editing checklist
+
 ## Optional skill
 
 This repo includes lightweight agent workflow skills:

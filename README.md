@@ -40,7 +40,7 @@ Requirements:
 - An Obsidian vault stored as local markdown files
 
 ```bash
-git clone https://github.com/kika-hub/obsidian-codex-mcp.git
+git clone https://github.com/dot-RealityTest/obsidian-codex-mcp.git
 cd obsidian-mcp
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip

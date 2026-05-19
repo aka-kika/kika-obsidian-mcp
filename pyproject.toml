@@ -16,6 +16,6 @@ dependencies = [
 keywords = ["mcp", "model-context-protocol", "obsidian", "codex", "markdown"]
 
 [project.urls]
-Homepage = "https://github.com/kika-hub/obsidian-codex-mcp"
-Repository = "https://github.com/kika-hub/obsidian-codex-mcp"
+Homepage = "https://github.com/dot-RealityTest/obsidian-codex-mcp"
+Repository = "https://github.com/dot-RealityTest/obsidian-codex-mcp"
 

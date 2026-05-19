@@ -1,8 +1,26 @@
 # Obsidian Codex MCP
 
-A local-first Model Context Protocol server for Obsidian vaults, built for Codex and other MCP clients.
+Local-first MCP server for working with an Obsidian vault.
 
-Obsidian Codex MCP lets AI coding agents and desktop assistants read, search, create, update, and organize Obsidian markdown notes through MCP. It does not require an Obsidian plugin, an API key, or a running Obsidian app. Point it at a vault folder and it works directly with local markdown files.
+- No Obsidian plugin required
+- No API key required
+- No cloud service required
+- No Obsidian running in the background
+
+This is for people who want MCP clients to work directly with markdown files on disk.
+
+> Independent open-source project. Not affiliated with Obsidian, Anthropic, OpenAI, or any MCP client.
+
+## What it does
+
+It lets MCP clients work with your vault to:
+
+- read and search notes
+- create and update notes
+- generate summaries, status reports, and release notes
+- automate local knowledge workflows
+
+All directly against your local markdown files.
 
 ## Best for
 
@@ -36,6 +54,16 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 | Read/write markdown files directly | Yes |
 | Work over a remote HTTP API | No, local stdio MCP only |
 
+## Safety features
+
+Designed to be useful without being reckless:
+
+- read-only mode, which refuses writes
+- backup-on-write mode before updates and deletes
+- vault path isolation
+- path traversal protection
+- no external network calls
+
 ## Tools
 
 - `configure_vault` - set or change the vault path
@@ -51,7 +79,20 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 - `create_folder` - create a folder inside the vault
 - `get_folder_structure` - return the vault folder tree
 
-## Install
+## Demo
+
+Short launch clip:
+
+[Obsidian + MCP + Codex demo](assets/obsidian-mcp-codex-demo.mp4)
+
+Useful follow-up demos to record:
+
+- AI edits a note in the vault, then Obsidian shows the result
+- read-only and backup-on-write behavior
+
+## Quick start
+
+### Install
 
 Requirements:
 
@@ -60,7 +101,7 @@ Requirements:
 
 ```bash
 git clone https://github.com/dot-RealityTest/obsidian-codex-mcp.git
-cd obsidian-mcp
+cd obsidian-codex-mcp
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
@@ -78,14 +119,14 @@ Add this to `~/.codex/config.toml` and restart Codex:
 
 ```toml
 [mcp_servers.obsidian]
-command = "/absolute/path/to/obsidian-mcp/.venv/bin/python"
-args = ["/absolute/path/to/obsidian-mcp/server.py"]
+command = "/absolute/path/to/obsidian-codex-mcp/.venv/bin/python"
+args = ["/absolute/path/to/obsidian-codex-mcp/server.py"]
 enabled = true
 
 [mcp_servers.obsidian.env]
 OBSIDIAN_VAULT_PATH = "/absolute/path/to/your/obsidian-vault"
 OBSIDIAN_READ_ONLY = "false"
-OBSIDIAN_BACKUP_ON_WRITE = "false"
+OBSIDIAN_BACKUP_ON_WRITE = "true"
 ```
 
 For a safer read/search-only setup:
@@ -102,12 +143,12 @@ Add this to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "obsidian": {
-      "command": "/absolute/path/to/obsidian-mcp/.venv/bin/python",
-      "args": ["/absolute/path/to/obsidian-mcp/server.py"],
+      "command": "/absolute/path/to/obsidian-codex-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/obsidian-codex-mcp/server.py"],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian-vault",
         "OBSIDIAN_READ_ONLY": "false",
-        "OBSIDIAN_BACKUP_ON_WRITE": "false"
+        "OBSIDIAN_BACKUP_ON_WRITE": "true"
       }
     }
   }

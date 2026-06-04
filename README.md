@@ -1,6 +1,6 @@
 # Obsidian Codex MCP
 
-[![CI](https://github.com/dot-RealityTest/obsidian-codex-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/dot-RealityTest/obsidian-codex-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-111827)](https://modelcontextprotocol.io/)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vaults-7C3AED?logo=obsidian&logoColor=white)](https://obsidian.md/)
@@ -108,7 +108,7 @@ Requirements:
 - An Obsidian vault stored as local markdown files
 
 ```bash
-git clone https://github.com/dot-RealityTest/obsidian-codex-mcp.git
+git clone https://github.com/aka-kika/obsidian-codex-mcp.git
 cd obsidian-codex-mcp
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip

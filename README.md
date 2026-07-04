@@ -1,6 +1,6 @@
 # Kika Obsidian MCP
 
-[![CI](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/aka-kika/kika-obsidian-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/aka-kika/kika-obsidian-mcp/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-111827)](https://modelcontextprotocol.io/)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vaults-7C3AED?logo=obsidian&logoColor=white)](https://obsidian.md/)
@@ -108,8 +108,8 @@ Requirements:
 - An Obsidian vault stored as local markdown files
 
 ```bash
-git clone https://github.com/aka-kika/obsidian-codex-mcp.git
-cd obsidian-codex-mcp
+git clone https://github.com/aka-kika/kika-obsidian-mcp.git
+cd kika-obsidian-mcp
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
@@ -127,8 +127,8 @@ Add this to `~/.codex/config.toml` and restart Codex:
 
 ```toml
 [mcp_servers.kika-obsidian]
-command = "/absolute/path/to/obsidian-codex-mcp/.venv/bin/python"
-args = ["/absolute/path/to/obsidian-codex-mcp/server.py"]
+command = "/absolute/path/to/kika-obsidian-mcp/.venv/bin/python"
+args = ["/absolute/path/to/kika-obsidian-mcp/server.py"]
 enabled = true
 
 [mcp_servers.kika-obsidian.env]
@@ -151,8 +151,8 @@ Add this to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "obsidian": {
-      "command": "/absolute/path/to/obsidian-codex-mcp/.venv/bin/python",
-      "args": ["/absolute/path/to/obsidian-codex-mcp/server.py"],
+      "command": "/absolute/path/to/kika-obsidian-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/kika-obsidian-mcp/server.py"],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian-vault",
         "OBSIDIAN_READ_ONLY": "false",

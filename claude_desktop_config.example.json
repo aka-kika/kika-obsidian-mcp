@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "obsidian": {
+    "kika-obsidian": {
       "command": "/absolute/path/to/obsidian-mcp/.venv/bin/python",
       "args": ["/absolute/path/to/obsidian-mcp/server.py"],
       "env": {

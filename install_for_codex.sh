@@ -35,17 +35,17 @@ mkdir -p "$(dirname "$CONFIG_FILE")"
 touch "$CONFIG_FILE"
 
 if grep -q '^\[mcp_servers\.obsidian\]' "$CONFIG_FILE"; then
-  echo "Codex already has an [mcp_servers.obsidian] entry:"
+  echo "Codex already has an [mcp_servers.kika-obsidian] entry:"
   echo "$CONFIG_FILE"
   echo
   echo "Update it to:"
   cat <<EOF
-[mcp_servers.obsidian]
+[mcp_servers.kika-obsidian]
 command = "$SCRIPT_DIR/.venv/bin/python"
 args = ["$SCRIPT_DIR/server.py"]
 enabled = true
 
-[mcp_servers.obsidian.env]
+[mcp_servers.kika-obsidian.env]
 OBSIDIAN_VAULT_PATH = "$VAULT_PATH"
 OBSIDIAN_READ_ONLY = "$READ_ONLY"
 OBSIDIAN_BACKUP_ON_WRITE = "$BACKUP_ON_WRITE"
@@ -53,12 +53,12 @@ EOF
 else
   cat >> "$CONFIG_FILE" <<EOF
 
-[mcp_servers.obsidian]
+[mcp_servers.kika-obsidian]
 command = "$SCRIPT_DIR/.venv/bin/python"
 args = ["$SCRIPT_DIR/server.py"]
 enabled = true
 
-[mcp_servers.obsidian.env]
+[mcp_servers.kika-obsidian.env]
 OBSIDIAN_VAULT_PATH = "$VAULT_PATH"
 OBSIDIAN_READ_ONLY = "$READ_ONLY"
 OBSIDIAN_BACKUP_ON_WRITE = "$BACKUP_ON_WRITE"

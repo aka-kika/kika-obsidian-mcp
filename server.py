@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Obsidian MCP Server
-Enables LLMs to interact with Obsidian vaults.
+Kika Obsidian MCP Server
+Enables LLMs to interact with Obsidian vaults directly on disk (no Obsidian app required).
 """
 
 import os
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize FastMCP server
-mcp = FastMCP("obsidian")
+mcp = FastMCP("kika-obsidian")
 
 # Global vault client (initialized when needed)
 _vault_client = None
@@ -66,7 +66,13 @@ def configure_vault(vault_path: str) -> dict:
         vault_path: Absolute path to your Obsidian vault
     """
     global _vault_client, _vault_path
-    
+
+    if os.getenv("OBSIDIAN_VAULT_PATH"):
+        return {
+            "success": False,
+            "error": "Vault path is locked by the OBSIDIAN_VAULT_PATH environment variable. Change it in the MCP server config instead.",
+        }
+
     _vault_path = vault_path
     _vault_client = None  # Reset client
     

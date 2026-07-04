@@ -1,4 +1,4 @@
-# Obsidian Codex MCP
+# Kika Obsidian MCP
 
 [![CI](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/aka-kika/obsidian-codex-mcp/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -126,12 +126,12 @@ OBSIDIAN_VAULT_PATH="/absolute/path/to/your/vault" .venv/bin/python test_server.
 Add this to `~/.codex/config.toml` and restart Codex:
 
 ```toml
-[mcp_servers.obsidian]
+[mcp_servers.kika-obsidian]
 command = "/absolute/path/to/obsidian-codex-mcp/.venv/bin/python"
 args = ["/absolute/path/to/obsidian-codex-mcp/server.py"]
 enabled = true
 
-[mcp_servers.obsidian.env]
+[mcp_servers.kika-obsidian.env]
 OBSIDIAN_VAULT_PATH = "/absolute/path/to/your/obsidian-vault"
 OBSIDIAN_READ_ONLY = "false"
 OBSIDIAN_BACKUP_ON_WRITE = "true"

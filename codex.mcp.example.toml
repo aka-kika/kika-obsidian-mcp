@@ -1,9 +1,9 @@
-[mcp_servers.obsidian]
+[mcp_servers.kika-obsidian]
 command = "/absolute/path/to/obsidian-mcp/.venv/bin/python"
 args = ["/absolute/path/to/obsidian-mcp/server.py"]
 enabled = true
 
-[mcp_servers.obsidian.env]
+[mcp_servers.kika-obsidian.env]
 OBSIDIAN_VAULT_PATH = "/absolute/path/to/your/obsidian-vault"
 OBSIDIAN_READ_ONLY = "false"
 OBSIDIAN_BACKUP_ON_WRITE = "false"

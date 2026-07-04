@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import frontmatter
 
+# Matches [[target]] and [[target|alias]]; group 1 = target, group 2 = alias (may be None)
+WIKILINK_RE = re.compile(r'\[\[([^\]|]+)(?:\|([^\]]*))?\]\]')
+
 
 class ObsidianVaultClient:
     """Client for interacting with Obsidian vault files."""
@@ -46,10 +49,21 @@ class ObsidianVaultClient:
         raw_content = note_path.read_text(encoding='utf-8')
 
         try:
-            post = frontmatter.loads(raw_content)
-            return post.content, dict(post.metadata)
+            # frontmatter.parse instead of .loads: .loads splats metadata into
+            # Post(**kwargs) and crashes on notes with a 'content:'/'handler:' key
+            metadata, content = frontmatter.parse(raw_content)
+            return content, dict(metadata)
         except (ParserError, ScannerError, yaml.YAMLError):
             return raw_content, {}
+
+    @staticmethod
+    def _dump_markdown(content: str, metadata: Dict[str, Any]) -> str:
+        """Serialize a note, omitting the frontmatter block when metadata is empty."""
+        if not metadata:
+            return content
+        post = frontmatter.Post(content)
+        post.metadata = dict(metadata)
+        return frontmatter.dumps(post)
 
     @staticmethod
     def _normalize_tags(value: Any) -> List[str]:
@@ -113,7 +127,7 @@ class ObsidianVaultClient:
                 'modified': metadata.get('modified')
             }
         except Exception as e:
-            raise RuntimeError(f"Error reading note {path}: {str(e)}")
+            raise RuntimeError(f"Error reading note {path}: {str(e)}") from e
     
     def create_note(self, path: str, content: str, metadata: Optional[Dict] = None) -> Dict[str, Any]:
         """Create a new note."""
@@ -125,12 +139,9 @@ class ObsidianVaultClient:
             raise ValueError(f"Note already exists: {path}")
         
         note_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        post = frontmatter.Post(content, **(metadata or {}))
-        
-        with open(note_path, 'w', encoding='utf-8') as f:
-            f.write(frontmatter.dumps(post))
-        
+
+        note_path.write_text(self._dump_markdown(content, metadata or {}), encoding='utf-8')
+
         return self.get_note(path)
     
     def update_note(self, path: str, content: Optional[str] = None, metadata: Optional[Dict] = None) -> Dict[str, Any]:
@@ -141,18 +152,16 @@ class ObsidianVaultClient:
             raise ValueError(f"Note does not exist: {path}")
         
         current_content, current_metadata = self._load_markdown(note_path)
-        post = frontmatter.Post(current_content, **current_metadata)
-        
+
         if content is not None:
-            post.content = content
-        
+            current_content = content
+
         if metadata is not None:
-            post.metadata.update(metadata)
-        
+            current_metadata.update(metadata)
+
         self._backup_note(note_path)
-        with open(note_path, 'w', encoding='utf-8') as f:
-            f.write(frontmatter.dumps(post))
-        
+        note_path.write_text(self._dump_markdown(current_content, current_metadata), encoding='utf-8')
+
         return self.get_note(path)
     
     def delete_note(self, path: str) -> bool:
@@ -180,10 +189,13 @@ class ObsidianVaultClient:
         notes = []
         for md_file in search_path.rglob("*.md"):
             rel_path = md_file.relative_to(self.vault_path)
+            # Skip hidden folders (.obsidian, .trash, .obsidian-mcp-backups, ...)
+            if any(part.startswith('.') for part in rel_path.parts):
+                continue
             note = self.get_note(str(rel_path))
             if note:
                 notes.append(note)
-        
+
         return notes
     
     def search_notes(self, query: str, folder: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -213,27 +225,25 @@ class ObsidianVaultClient:
     def get_backlinks(self, path: str) -> List[Dict[str, Any]]:
         """Find all notes that link to the specified note."""
         target_name = Path(path).stem
+        target_no_ext = str(Path(path).with_suffix(''))
         all_notes = self.list_notes()
         backlinks = []
-        
-        link_pattern = re.compile(r'\\[\\[([^\\]|]+)\\|?([^\\]]*)?\\]\\]')
-        
+
         for note in all_notes:
             if note['path'] == path:
                 continue
-            
+
             content = note['content']
-            matches = link_pattern.findall(content)
-            
-            for match in matches:
-                link_target = match[0].split('#')[0]  # Remove header references
-                if link_target == target_name or link_target == path:
+
+            for target, alias in WIKILINK_RE.findall(content):
+                link_target = target.split('#')[0].strip()  # Remove header references
+                if link_target in (target_name, target_no_ext, path):
                     backlinks.append({
                         'note': note,
-                        'link_text': match[1] if match[1] else match[0]
+                        'link_text': alias if alias else target
                     })
                     break
-        
+
         return backlinks
     
     def get_note_links(self, path: str) -> List[str]:
@@ -243,13 +253,13 @@ class ObsidianVaultClient:
             return []
         
         content = note['content']
-        link_pattern = re.compile(r'\\[\\[([^\\]|]+)(?:\\|[^\\]]*)?\\]\\]')
-        
+
         links = []
-        for match in link_pattern.findall(content):
-            link_target = match.split('#')[0]  # Remove header references
-            links.append(link_target)
-        
+        for target, _alias in WIKILINK_RE.findall(content):
+            link_target = target.split('#')[0].strip()  # Remove header references
+            if link_target:
+                links.append(link_target)
+
         return links
     
     def create_folder(self, folder_path: str) -> bool:

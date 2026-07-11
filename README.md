@@ -94,11 +94,15 @@ Designed to be useful without being reckless:
 
 First-class, schema-validated support for [Obsidian Bases](https://help.obsidian.md/bases) — database-like views over your notes. Very few Obsidian MCP servers support these.
 
+![A base is validated against the Bases schema before anything is written — an invalid view is rejected with the offending path named, and no file is created](docs/assets/bases-validation.gif)
+
 - `create_base` - create a `.base` file, validated against the Bases schema before writing
 - `update_base` - merge changes into a base (update a view by name, add/remove views, change filters/formulas/properties)
 - `get_base` - read a `.base` as parsed structure + raw YAML; tolerant of imperfect files
 - `list_bases` - list `.base` files in the vault or a folder, with their view names
 - `delete_base` - delete a `.base` file
+
+![Creating a base and reading it back through the MCP tools — the full round-trip](docs/assets/bases-workflow.gif)
 
 All four Obsidian view modes are supported — **table**, **list**, **cards**, and **map** — and any of them can be mixed in a single base. Map views (from the [Maps community plugin](https://obsidian.md/plugins?id=maps)) round-trip cleanly too: their marker and zoom settings are preserved on read and re-write.
 
@@ -106,14 +110,9 @@ See [docs/bases-examples.md](docs/bases-examples.md) for copyable examples of ea
 
 ## Demo
 
-Short launch clip:
+![Claude drives the MCP server on the left while the Obsidian vault updates live on the right](docs/assets/demo-split.gif)
 
-[Obsidian + MCP demo](assets/obsidian-mcp-codex-demo.mp4)
-
-Useful follow-up demos to record:
-
-- AI edits a note in the vault, then Obsidian shows the result
-- read-only and backup-on-write behavior
+Full-length clip: [Obsidian + MCP demo](assets/obsidian-mcp-codex-demo.mp4)
 
 ## Quick start
 

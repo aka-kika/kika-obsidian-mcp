@@ -1,6 +1,6 @@
 [project]
 name = "kika-obsidian-mcp"
-version = "0.2.0"
+version = "0.3.0"
 description = "Kika's local-first MCP server for Obsidian vaults — direct filesystem access, works without the Obsidian app. For Claude Code, Codex, Grok, and other MCP clients."
 readme = "README.md"
 requires-python = ">=3.10"

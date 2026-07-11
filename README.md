@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-111827)](https://modelcontextprotocol.io/)
 [![Obsidian](https://img.shields.io/badge/Obsidian-vaults-7C3AED?logo=obsidian&logoColor=white)](https://obsidian.md/)
-[![Codex](https://img.shields.io/badge/Codex-ready-111827?logo=openai&logoColor=white)](https://openai.com/codex/)
+[![Works with](https://img.shields.io/badge/works%20with-any%20MCP%20client-111827)](#configure-your-mcp-client)
 [![Local first](https://img.shields.io/badge/local--first-markdown-10B981)](#safety-features)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -33,9 +33,9 @@ All directly against your local markdown files.
 
 ## Best for
 
-- Codex users who want safe local access to an Obsidian vault
-- Claude Desktop, Cline, Cursor, and other MCP clients that can run a local Python server
+- Anyone using an MCP client — Claude Code, Claude Desktop, Cursor, Cline, Codex, Grok — who wants safe local access to an Obsidian vault
 - Developers who prefer filesystem-based Obsidian automation over the Local REST API plugin
+- People who want to create and edit Obsidian Bases (`.base`) from an agent
 - Personal knowledge bases, project logs, daily notes, task notes, and markdown-first workflows
 
 ## Why this exists
@@ -45,7 +45,7 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 - direct filesystem access to a local vault
 - no network calls
 - no Obsidian API token
-- Codex-friendly TOML configuration
+- works with any MCP client — simple JSON or TOML config for Claude Code, Claude Desktop, Cursor, Cline, Codex, and Grok
 - tolerant of real-world vaults with imperfect frontmatter
 - path traversal protection so tools cannot escape the configured vault
 - optional read-only mode for safer review/search workflows
@@ -56,8 +56,8 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 
 | Need | This project |
 | --- | --- |
-| Use Obsidian with Codex | Yes, with `~/.codex/config.toml` examples |
-| Use Obsidian with Claude Desktop | Yes, with JSON config examples |
+| Use Obsidian with any MCP client | Yes — Claude Code, Claude Desktop, Cursor, Cline, Codex, Grok |
+| Config format | JSON or TOML, per client (examples for each) |
 | Require an Obsidian plugin | No |
 | Require an API key | No |
 | Require Obsidian to be open | No |
@@ -106,7 +106,7 @@ See [docs/bases-examples.md](docs/bases-examples.md) for copyable examples.
 
 Short launch clip:
 
-[Obsidian + MCP + Codex demo](assets/obsidian-mcp-codex-demo.mp4)
+[Obsidian + MCP demo](assets/obsidian-mcp-codex-demo.mp4)
 
 Useful follow-up demos to record:
 
@@ -125,20 +125,58 @@ Requirements:
 ```bash
 git clone https://github.com/aka-kika/kika-obsidian-mcp.git
 cd kika-obsidian-mcp
+./install.sh /absolute/path/to/your/obsidian-vault
+```
+
+`install.sh` creates a local virtualenv, installs dependencies, verifies against your vault, then prints ready-to-paste config for the client you choose (`--client claude|claude-desktop|codex|cursor|cline|grok`, default: all).
+
+Prefer to do it by hand? The manual steps are:
+
+```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
-```
-
-Verify against your vault:
-
-```bash
 OBSIDIAN_VAULT_PATH="/absolute/path/to/your/vault" .venv/bin/python test_server.py
 ```
 
-## Codex configuration
+## Configure your MCP client
 
-Add this to `~/.codex/config.toml` and restart Codex:
+The server is a local stdio MCP server, so any MCP-capable client can run it. Point the client at your virtualenv's Python and `server.py`, and set the vault path via env. Then restart or reconnect the client.
+
+### Claude Code
+
+```bash
+claude mcp add kika-obsidian \
+  --env OBSIDIAN_VAULT_PATH="/absolute/path/to/your/obsidian-vault" \
+  --env OBSIDIAN_READ_ONLY="false" \
+  --env OBSIDIAN_BACKUP_ON_WRITE="true" \
+  -- /absolute/path/to/kika-obsidian-mcp/.venv/bin/python \
+     /absolute/path/to/kika-obsidian-mcp/server.py
+```
+
+### Claude Desktop / Cursor / Cline
+
+Add this to the client's MCP config (`claude_desktop_config.json`, or the equivalent `mcpServers` block):
+
+```json
+{
+  "mcpServers": {
+    "kika-obsidian": {
+      "command": "/absolute/path/to/kika-obsidian-mcp/.venv/bin/python",
+      "args": ["/absolute/path/to/kika-obsidian-mcp/server.py"],
+      "env": {
+        "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian-vault",
+        "OBSIDIAN_READ_ONLY": "false",
+        "OBSIDIAN_BACKUP_ON_WRITE": "true"
+      }
+    }
+  }
+}
+```
+
+### Codex / Grok
+
+Add this to `~/.codex/config.toml` (or `~/.grok/config.toml`):
 
 ```toml
 [mcp_servers.kika-obsidian]
@@ -152,31 +190,7 @@ OBSIDIAN_READ_ONLY = "false"
 OBSIDIAN_BACKUP_ON_WRITE = "true"
 ```
 
-For a safer read/search-only setup:
-
-```toml
-OBSIDIAN_READ_ONLY = "true"
-```
-
-## Claude Desktop configuration
-
-Add this to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "/absolute/path/to/kika-obsidian-mcp/.venv/bin/python",
-      "args": ["/absolute/path/to/kika-obsidian-mcp/server.py"],
-      "env": {
-        "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian-vault",
-        "OBSIDIAN_READ_ONLY": "false",
-        "OBSIDIAN_BACKUP_ON_WRITE": "true"
-      }
-    }
-  }
-}
-```
+For a safer read/search-only setup, set `OBSIDIAN_READ_ONLY="true"` (TOML: `OBSIDIAN_READ_ONLY = "true"`).
 
 ## Environment
 
@@ -224,7 +238,7 @@ Write the report back into Obsidian:
 ```bash
 OBSIDIAN_VAULT_PATH="/absolute/path/to/your/vault" .venv/bin/python scripts/daily_status_report.py \
   --folder "Projects" \
-  --write "Codex/Daily Project Status.md"
+  --write "Reports/Daily Project Status.md"
 ```
 
 The script reports recent notes, markdown checkbox tasks, and top tags. It uses backup-on-write when updating an existing report note.
@@ -246,7 +260,7 @@ See [docs/common-workflows.md](docs/common-workflows.md) for practical examples:
 
 Copyable Obsidian note templates live in [docs/templates](docs/templates):
 
-- [Codex work log](docs/templates/codex-work-log.md) for daily project status and workstream summaries
+- [Work log](docs/templates/work-log.md) for daily project status and workstream summaries
 - [Project session log](docs/templates/project-session-log.md) for per-project session notes, decisions, links, and next moves
 - [Weekly review](docs/templates/weekly-review.md) for accomplishments, open loops, and next-week priorities
 
@@ -267,9 +281,9 @@ Use them as guidance for agents that work with this MCP server. They cover safe 
 
 Yes. It is a local MCP server for Obsidian vaults. It exposes tools for notes, tags, backlinks, wikilinks, folders, search, and optional writes.
 
-### Does it work with Codex?
+### Which MCP clients does it work with?
 
-Yes. The main setup path is Codex-first and uses `~/.codex/config.toml`.
+Any client that can run a local stdio MCP server — Claude Code, Claude Desktop, Cursor, Cline, Codex, and Grok are all covered with copy-paste config above. It is just a local Python process, so anything that speaks MCP over stdio can use it. Run `./install.sh --client <name> /path/to/vault` to print the exact config for your client.
 
 ### Does it support Obsidian Bases?
 

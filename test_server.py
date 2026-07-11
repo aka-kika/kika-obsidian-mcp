@@ -419,7 +419,7 @@ def run_all_tests():
     if passed == total:
         print("🎉 All tests passed! The server is ready to use.")
         print("\n🔧 Next steps:")
-        print("   For Codex: Run ./install_for_codex.sh <vault_path>")
+        print("   Run ./install.sh <vault_path> to set up and print your client's MCP config")
         return 0
     else:
         print("❌ Some tests failed. Please check the errors above.")

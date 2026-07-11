@@ -39,7 +39,7 @@ Ask the agent:
 If approved, write it to:
 
 ```text
-Codex/Daily Project Status.md
+Reports/Daily Project Status.md
 ```
 
 ### Vault Triage

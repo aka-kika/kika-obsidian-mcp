@@ -27,7 +27,7 @@ jobs:
         run: |
           test -f docs/common-workflows.md
           test -f docs/bases-examples.md
-          test -f docs/templates/codex-work-log.md
+          test -f docs/templates/work-log.md
           test -f docs/templates/project-session-log.md
           test -f docs/templates/weekly-review.md
           test -f skills/obsidian-vault-workflow/SKILL.md

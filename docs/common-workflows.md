@@ -1,6 +1,6 @@
 # Common Workflows
 
-Practical ways to use Obsidian Codex MCP with Codex, Claude Desktop, Cline, Cursor, and other local MCP clients.
+Practical ways to use Kika Obsidian MCP with Claude Code, Claude Desktop, Cursor, Cline, Codex, Grok, and other local MCP clients.
 
 ## 1. Explore a Vault Safely
 
@@ -72,7 +72,7 @@ Write the report into Obsidian:
 OBSIDIAN_VAULT_PATH="/absolute/path/to/your/vault" \
   .venv/bin/python scripts/daily_status_report.py \
   --folder "Projects" \
-  --write "Codex/Daily Project Status.md"
+  --write "Reports/Daily Project Status.md"
 ```
 
 The report includes:
@@ -91,13 +91,13 @@ Agent prompt:
 ```text
 Create or update a release note for PROJECT_NAME.
 Include the repo URL, live URL, what shipped, verification, SEO/GEO notes, and follow-ups.
-Save it under Codex/Release Notes/.
+Save it under Release Notes/.
 ```
 
 Suggested note path:
 
 ```text
-Codex/Release Notes/YYYY-MM-DD — Project Name.md
+Release Notes/YYYY-MM-DD — Project Name.md
 ```
 
 Use the bundled skill:

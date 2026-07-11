@@ -7,7 +7,7 @@ status: active
 tags:
   - project-log
   - session-log
-  - codex
+  - mcp
 ---
 
 # Project - YYYY-MM-DD

@@ -3,10 +3,9 @@ tags:
   - daily-report
   - achievements
   - daily
-  - codex
   - work-log
 report_date: "YYYY-MM-DD"
-source: codex
+source: mcp
 created: "YYYY-MM-DDTHH:mm:ss"
 timezone: UTC
 ---

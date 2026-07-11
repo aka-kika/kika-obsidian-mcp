@@ -1,7 +1,7 @@
 [project]
 name = "kika-obsidian-mcp"
 version = "0.3.0"
-description = "Kika's local-first MCP server for Obsidian vaults — direct filesystem access, works without the Obsidian app. For Claude Code, Codex, Grok, and other MCP clients."
+description = "Kika's local-first MCP server for Obsidian vaults — direct filesystem access, works without the Obsidian app. Works with any MCP client (Claude Code, Claude Desktop, Cursor, Cline, Codex, Grok). Includes schema-validated Obsidian Bases (.base) support."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -20,8 +20,10 @@ keywords = [
   "obsidian-mcp",
   "obsidian-bases",
   "bases",
-  "codex",
+  "claude-code",
   "claude-desktop",
+  "cursor",
+  "codex",
   "markdown",
   "local-first",
   "knowledge-base"

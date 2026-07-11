@@ -12,7 +12,7 @@ Create or update an Obsidian release note when a project is deployed, published,
 Default folder:
 
 ```text
-Codex/Release Notes/
+Release Notes/
 ```
 
 Default filename:
@@ -42,7 +42,7 @@ Include these sections unless the user asks for a different format:
 
 1. Gather release facts from the conversation, repo, deploy output, GitHub, or local files.
 2. Use `list_notes` or `get_note` to check whether a release note already exists.
-3. Create the folder `Codex/Release Notes` if missing.
+3. Create the folder `Release Notes` if missing.
 4. Create or update the release note.
 5. Keep wording useful for both public release history and private project memory.
 6. End with the note path and any missing details that still need the user.

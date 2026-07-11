@@ -8,6 +8,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import frontmatter
 
+from bases import (
+    dump_base,
+    merge_base,
+    parse_base,
+    validate_base_schema,
+    view_names,
+)
+
 # Matches [[target]] and [[target|alias]]; group 1 = target, group 2 = alias (may be None)
 WIKILINK_RE = re.compile(r'\[\[([^\]|]+)(?:\|([^\]]*))?\]\]')
 
@@ -43,6 +51,13 @@ class ObsidianVaultClient:
             raise ValueError("Path must stay inside the configured vault") from exc
 
         return resolved_path
+
+    def _resolve_base_path(self, path: str) -> Path:
+        """Resolve a vault-relative path and require the .base extension."""
+        base_path = self._resolve_vault_path(path)
+        if base_path.suffix.lower() != '.base':
+            raise ValueError("Base path must end with .base")
+        return base_path
 
     def _load_markdown(self, note_path: Path) -> tuple[str, Dict[str, Any]]:
         """Load markdown and tolerate broken YAML frontmatter."""
@@ -95,16 +110,19 @@ class ObsidianVaultClient:
         matches = re.findall(r'(?<!\w)#([A-Za-z0-9_/-]+)', content)
         return [tag for tag in matches if tag]
 
-    def _backup_note(self, note_path: Path) -> Optional[Path]:
-        """Copy an existing note into the backup folder when backup mode is enabled."""
-        if not self.backup_on_write or not note_path.exists() or not note_path.is_file():
+    def _backup_file(self, file_path: Path) -> Optional[Path]:
+        """Copy an existing file into the backup folder when backup mode is enabled.
+
+        Used for both markdown notes and ``.base`` files before update/delete.
+        """
+        if not self.backup_on_write or not file_path.exists() or not file_path.is_file():
             return None
 
-        relative_path = note_path.relative_to(self.vault_path)
+        relative_path = file_path.relative_to(self.vault_path)
         timestamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
         backup_path = self.vault_path / '.obsidian-mcp-backups' / timestamp / relative_path
         backup_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(note_path, backup_path)
+        shutil.copy2(file_path, backup_path)
         return backup_path
     
     def get_note(self, path: str) -> Optional[Dict[str, Any]]:
@@ -159,7 +177,7 @@ class ObsidianVaultClient:
         if metadata is not None:
             current_metadata.update(metadata)
 
-        self._backup_note(note_path)
+        self._backup_file(note_path)
         note_path.write_text(self._dump_markdown(current_content, current_metadata), encoding='utf-8')
 
         return self.get_note(path)
@@ -171,9 +189,9 @@ class ObsidianVaultClient:
         if not note_path.exists():
             return False
         if note_path.suffix.lower() != '.md':
-            raise ValueError("Only markdown notes can be deleted")
-        
-        self._backup_note(note_path)
+            raise ValueError("Only markdown notes can be deleted with delete_note; use delete_base for .base files")
+
+        self._backup_file(note_path)
         note_path.unlink()
         return True
     
@@ -299,3 +317,137 @@ class ObsidianVaultClient:
         
         build_structure(self.vault_path, structure)
         return structure
+
+    # ------------------------------------------------------------------
+    # Obsidian Bases (.base files)
+    # ------------------------------------------------------------------
+
+    def get_base(self, path: str) -> Optional[Dict[str, Any]]:
+        """Read a .base file as a parsed structure plus raw YAML.
+
+        Tolerant of imperfect files: if the YAML cannot be parsed, the raw
+        content is returned with ``parse_error`` set instead of raising.
+        Returns ``None`` when the file does not exist.
+        """
+        base_path = self._resolve_base_path(path)
+        if not base_path.exists() or not base_path.is_file():
+            return None
+
+        raw = base_path.read_text(encoding='utf-8')
+        data, error = parse_base(raw)
+
+        result = {
+            'path': str(base_path.relative_to(self.vault_path)),
+            'raw': raw,
+        }
+        if error is not None:
+            result['data'] = None
+            result['views'] = []
+            result['parse_error'] = error
+        else:
+            result['data'] = data
+            result['views'] = view_names(data)
+            result['parse_error'] = None
+        return result
+
+    def create_base(self, path: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new .base file after validating its schema."""
+        base_path = self._resolve_base_path(path)
+
+        if base_path.exists():
+            raise ValueError(f"Base already exists: {path}")
+
+        errors = validate_base_schema(data)
+        if errors:
+            raise ValueError("Invalid base schema:\n- " + "\n- ".join(errors))
+
+        base_path.parent.mkdir(parents=True, exist_ok=True)
+        base_path.write_text(dump_base(data), encoding='utf-8')
+        return self.get_base(path)
+
+    def update_base(
+        self,
+        path: str,
+        filters: Any = None,
+        formulas: Optional[Dict[str, Any]] = None,
+        properties: Optional[Dict[str, Any]] = None,
+        summaries: Optional[Dict[str, Any]] = None,
+        upsert_views: Optional[List[Dict[str, Any]]] = None,
+        remove_views: Optional[List[str]] = None,
+        replace_filters: bool = False,
+    ) -> Dict[str, Any]:
+        """Apply a partial update to an existing .base file.
+
+        Reads the file, merges the requested changes, re-validates the whole
+        structure, backs up the original (when backup mode is on), then writes.
+        """
+        base_path = self._resolve_base_path(path)
+
+        if not base_path.exists():
+            raise ValueError(f"Base does not exist: {path}")
+
+        raw = base_path.read_text(encoding='utf-8')
+        existing, error = parse_base(raw)
+        if error is not None:
+            raise ValueError(
+                f"Cannot update a base with invalid YAML ({error}). "
+                "Fix it by hand or recreate it with create_base."
+            )
+
+        new_data = merge_base(
+            existing,
+            filters=filters,
+            formulas=formulas,
+            properties=properties,
+            summaries=summaries,
+            upsert_views=upsert_views,
+            remove_views=remove_views,
+            replace_filters=replace_filters,
+        )
+
+        errors = validate_base_schema(new_data)
+        if errors:
+            raise ValueError("Update would produce an invalid base:\n- " + "\n- ".join(errors))
+
+        self._backup_file(base_path)
+        base_path.write_text(dump_base(new_data), encoding='utf-8')
+        return self.get_base(path)
+
+    def list_bases(self, folder: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List all .base files in the vault or a folder, with their view names."""
+        search_path = self._resolve_vault_path(folder) if folder else self.vault_path
+
+        if not search_path.exists():
+            return []
+        if not search_path.is_dir():
+            raise ValueError(f"Folder is not a directory: {folder}")
+
+        bases = []
+        for base_file in search_path.rglob("*.base"):
+            rel_path = base_file.relative_to(self.vault_path)
+            # Skip hidden folders (.obsidian, .trash, .obsidian-mcp-backups, ...)
+            if any(part.startswith('.') for part in rel_path.parts):
+                continue
+
+            raw = base_file.read_text(encoding='utf-8')
+            data, error = parse_base(raw)
+            entry = {'path': str(rel_path)}
+            if error is not None:
+                entry['views'] = []
+                entry['parse_error'] = error
+            else:
+                entry['views'] = view_names(data)
+            bases.append(entry)
+
+        return sorted(bases, key=lambda b: b['path'])
+
+    def delete_base(self, path: str) -> bool:
+        """Delete a .base file. Only .base files are eligible via this method."""
+        base_path = self._resolve_base_path(path)
+
+        if not base_path.exists():
+            return False
+
+        self._backup_file(base_path)
+        base_path.unlink()
+        return True

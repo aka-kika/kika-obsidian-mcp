@@ -6,9 +6,10 @@ Enables LLMs to interact with Obsidian vaults directly on disk (no Obsidian app 
 
 import os
 import logging
-from typing import Optional
+from typing import Any, Optional
 from mcp.server.fastmcp import FastMCP
 from obsidian_client import ObsidianVaultClient
+from bases import build_base
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -302,6 +303,159 @@ def get_folder_structure() -> dict:
     try:
         client = get_vault_client()
         return client.get_folder_structure()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def create_base(
+    path: str,
+    views: list,
+    filters: Optional[Any] = None,
+    formulas: Optional[dict] = None,
+    properties: Optional[dict] = None,
+    summaries: Optional[dict] = None,
+) -> dict:
+    """Create a new Obsidian Base (.base) file with schema validation.
+
+    Bases are database-like views over your notes. The structure is validated
+    against the official Bases schema before anything is written; an invalid
+    base is rejected with a message naming the offending path, and no file is
+    created.
+
+    Args:
+        path: Vault-relative path ending in .base (e.g., "Bases/Tasks.base")
+        views: List of view objects (at least one). Each needs a "type"
+            (table | list | cards | map) and usually a "name" and "order".
+        filters: Optional global filter. Either a string statement or a mapping
+            with one of "and" / "or" / "not" holding a list of conditions.
+        formulas: Optional mapping of formula name -> expression string.
+        properties: Optional mapping of property name -> config (e.g.,
+            {"status": {"displayName": "Status"}}).
+        summaries: Optional mapping of summary name -> expression string.
+    """
+    try:
+        if is_read_only():
+            return read_only_error()
+
+        client = get_vault_client()
+        data = build_base(
+            views,
+            filters=filters,
+            formulas=formulas,
+            properties=properties,
+            summaries=summaries,
+        )
+        return client.create_base(path, data)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def update_base(
+    path: str,
+    filters: Optional[Any] = None,
+    formulas: Optional[dict] = None,
+    properties: Optional[dict] = None,
+    summaries: Optional[dict] = None,
+    upsert_views: Optional[list] = None,
+    remove_views: Optional[list] = None,
+    replace_filters: bool = False,
+) -> dict:
+    """Update an existing .base file with merge semantics, then re-validate.
+
+    The file is read, the requested changes are merged, the whole structure is
+    re-validated, the original is backed up (when backup-on-write is enabled),
+    and the result is written back.
+
+    Args:
+        path: Vault-relative path to the .base file.
+        filters: When provided, replaces the global filters wholesale. To
+            remove filters entirely, pass replace_filters=true and leave this
+            unset.
+        formulas: Mapping merged into existing formulas. A null value for a key
+            removes that formula.
+        properties: Mapping merged into existing properties (null removes).
+        summaries: Mapping merged into existing summaries (null removes).
+        upsert_views: List of view objects. Each replaces the existing view
+            with the same "name", or is appended when there is no match.
+        remove_views: List of view names to delete.
+        replace_filters: Set true (with filters unset) to remove global filters.
+    """
+    try:
+        if is_read_only():
+            return read_only_error()
+
+        client = get_vault_client()
+        return client.update_base(
+            path,
+            filters=filters,
+            formulas=formulas,
+            properties=properties,
+            summaries=summaries,
+            upsert_views=upsert_views,
+            remove_views=remove_views,
+            replace_filters=replace_filters,
+        )
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def get_base(path: str) -> dict:
+    """Read a .base file as a parsed structure plus its raw YAML.
+
+    Tolerant of imperfect files: if the YAML cannot be parsed, the raw content
+    is returned with a "parse_error" field instead of failing.
+
+    Args:
+        path: Vault-relative path to the .base file.
+    """
+    try:
+        client = get_vault_client()
+        base = client.get_base(path)
+        if base is None:
+            return {"error": f"Base not found: {path}"}
+        return base
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def list_bases(folder: Optional[str] = None) -> list:
+    """List all .base files in the vault or a folder, with their view names.
+
+    Args:
+        folder: Optional folder path to search within (e.g., "Bases/").
+    """
+    try:
+        client = get_vault_client()
+        return client.list_bases(folder)
+    except Exception as e:
+        return [{"error": str(e)}]
+
+
+@mcp.tool()
+def delete_base(path: str) -> dict:
+    """Delete a .base file.
+
+    Respects read-only mode and backup-on-write. Only .base files can be
+    deleted through this tool.
+
+    Args:
+        path: Vault-relative path to the .base file to delete.
+    """
+    try:
+        if is_read_only():
+            return read_only_error()
+
+        client = get_vault_client()
+        success = client.delete_base(path)
+
+        if success:
+            return {"success": True, "message": f"Base deleted: {path}"}
+        else:
+            return {"error": f"Base not found: {path}"}
     except Exception as e:
         return {"error": str(e)}
 

@@ -25,6 +25,7 @@ It lets MCP clients work with your vault to:
 
 - read and search notes
 - create and update notes
+- create and edit Obsidian Bases (`.base` files) with schema validation
 - generate summaries, status reports, and release notes
 - automate local knowledge workflows
 
@@ -49,6 +50,7 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 - path traversal protection so tools cannot escape the configured vault
 - optional read-only mode for safer review/search workflows
 - optional backup-on-write before updates and deletes
+- **first-class Obsidian Bases (`.base`) support with schema validation** — a differentiator: almost no other Obsidian MCP server can create or edit Bases, and this one validates them against the official schema so it never writes a file Obsidian would silently reject
 
 ## How it compares
 
@@ -60,6 +62,7 @@ There are already a handful of Obsidian MCP servers. Many depend on the Obsidian
 | Require an API key | No |
 | Require Obsidian to be open | No |
 | Read/write markdown files directly | Yes |
+| Create and edit Obsidian Bases (`.base`) | Yes, with schema validation |
 | Work over a remote HTTP API | No, local stdio MCP only |
 
 ## Safety features
@@ -86,6 +89,18 @@ Designed to be useful without being reckless:
 - `get_note_links` - extract wikilinks from a note
 - `create_folder` - create a folder inside the vault
 - `get_folder_structure` - return the vault folder tree
+
+### Bases (`.base` files)
+
+First-class, schema-validated support for [Obsidian Bases](https://help.obsidian.md/bases) — database-like views over your notes. Very few Obsidian MCP servers support these.
+
+- `create_base` - create a `.base` file, validated against the Bases schema before writing
+- `update_base` - merge changes into a base (update a view by name, add/remove views, change filters/formulas/properties)
+- `get_base` - read a `.base` as parsed structure + raw YAML; tolerant of imperfect files
+- `list_bases` - list `.base` files in the vault or a folder, with their view names
+- `delete_base` - delete a `.base` file
+
+See [docs/bases-examples.md](docs/bases-examples.md) for copyable examples.
 
 ## Demo
 
@@ -175,9 +190,10 @@ Add this to `claude_desktop_config.json`:
 
 - All note paths are resolved relative to `OBSIDIAN_VAULT_PATH`.
 - Absolute paths and `../` path traversal are rejected.
-- Writes can be disabled with `OBSIDIAN_READ_ONLY=true`.
-- Existing notes can be copied to `.obsidian-mcp-backups/` before update/delete with `OBSIDIAN_BACKUP_ON_WRITE=true`.
-- Only markdown notes can be deleted.
+- Writes can be disabled with `OBSIDIAN_READ_ONLY=true` (this also blocks `create_base`, `update_base`, and `delete_base`).
+- Existing notes and `.base` files can be copied to `.obsidian-mcp-backups/` before update/delete with `OBSIDIAN_BACKUP_ON_WRITE=true`.
+- Deletes are extension-scoped: `delete_note` only removes markdown (`.md`) notes and `delete_base` only removes Bases (`.base`) files. Neither can touch other file types.
+- Base tools accept only `.base` paths and note tools only `.md` paths, so the two never cross-contaminate.
 - The server makes no external network calls.
 - Broken YAML frontmatter does not break listing/search; the note is still readable with empty metadata.
 
@@ -254,6 +270,10 @@ Yes. It is a local MCP server for Obsidian vaults. It exposes tools for notes, t
 ### Does it work with Codex?
 
 Yes. The main setup path is Codex-first and uses `~/.codex/config.toml`.
+
+### Does it support Obsidian Bases?
+
+Yes, with dedicated schema-validated tools. `create_base`, `update_base`, `get_base`, `list_bases`, and `delete_base` let MCP clients build and edit `.base` files directly on disk. Every write is validated against the [official Bases schema](https://help.obsidian.md/bases/syntax) first, so it never writes a file Obsidian would silently reject, and errors name the exact offending path (for example, `views[0].groupBy missing 'property' key`). `get_base` is tolerant of imperfect files: if the YAML cannot be parsed it returns the raw content with a `parse_error` flag instead of failing. This is a differentiator — almost no other Obsidian MCP server can create or edit Bases. See [docs/bases-examples.md](docs/bases-examples.md).
 
 ### Does it need the Obsidian Local REST API plugin?
 

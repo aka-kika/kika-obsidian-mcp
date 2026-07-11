@@ -21,11 +21,12 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Syntax check
-        run: python -m py_compile server.py obsidian_client.py test_server.py
+        run: python -m py_compile server.py obsidian_client.py bases.py test_server.py
 
       - name: Check skill file
         run: |
           test -f docs/common-workflows.md
+          test -f docs/bases-examples.md
           test -f docs/templates/codex-work-log.md
           test -f docs/templates/project-session-log.md
           test -f docs/templates/weekly-review.md

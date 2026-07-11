@@ -100,7 +100,9 @@ First-class, schema-validated support for [Obsidian Bases](https://help.obsidian
 - `list_bases` - list `.base` files in the vault or a folder, with their view names
 - `delete_base` - delete a `.base` file
 
-See [docs/bases-examples.md](docs/bases-examples.md) for copyable examples.
+All four Obsidian view modes are supported — **table**, **list**, **cards**, and **map** — and any of them can be mixed in a single base. Map views (from the [Maps community plugin](https://obsidian.md/plugins?id=maps)) round-trip cleanly too: their marker and zoom settings are preserved on read and re-write.
+
+See [docs/bases-examples.md](docs/bases-examples.md) for copyable examples of each view mode.
 
 ## Demo
 
@@ -287,7 +289,7 @@ Any client that can run a local stdio MCP server — Claude Code, Claude Desktop
 
 ### Does it support Obsidian Bases?
 
-Yes, with dedicated schema-validated tools. `create_base`, `update_base`, `get_base`, `list_bases`, and `delete_base` let MCP clients build and edit `.base` files directly on disk. Every write is validated against the [official Bases schema](https://help.obsidian.md/bases/syntax) first, so it never writes a file Obsidian would silently reject, and errors name the exact offending path (for example, `views[0].groupBy missing 'property' key`). `get_base` is tolerant of imperfect files: if the YAML cannot be parsed it returns the raw content with a `parse_error` flag instead of failing. This is a differentiator — almost no other Obsidian MCP server can create or edit Bases. See [docs/bases-examples.md](docs/bases-examples.md).
+Yes, with dedicated schema-validated tools. `create_base`, `update_base`, `get_base`, `list_bases`, and `delete_base` let MCP clients build and edit `.base` files directly on disk. Every write is validated against the [official Bases schema](https://help.obsidian.md/bases/syntax) first, so it never writes a file Obsidian would silently reject, and errors name the exact offending path (for example, `views[0].groupBy missing 'property' key`). `get_base` is tolerant of imperfect files: if the YAML cannot be parsed it returns the raw content with a `parse_error` flag instead of failing. All four view modes — table, list, cards, and map — are supported, and map bases from the Maps community plugin round-trip without losing their marker/zoom settings. This is a differentiator — almost no other Obsidian MCP server can create or edit Bases. See [docs/bases-examples.md](docs/bases-examples.md).
 
 ### Does it need the Obsidian Local REST API plugin?
 

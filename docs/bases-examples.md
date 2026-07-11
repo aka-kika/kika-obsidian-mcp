@@ -166,6 +166,66 @@ Call `create_base` with `path = "Bases/Daily.base"` and:
 
 ---
 
+## 4. Places map
+
+A `map` view that pins notes by a `coordinates` property, colouring and
+labelling each marker from other properties. The `map` layout is provided by the
+[Maps community plugin](https://obsidian.md/plugins?id=maps) — its per-view keys
+(`coordinates`, `markerIcon`, `markerColor`, `defaultZoom`, …) round-trip
+unchanged, so a base Obsidian saved with a map view can be re-read and re-written
+without tripping validation.
+
+Call `create_base` with `path = "Bases/Places.base"` and:
+
+```json
+{
+  "filters": "file.hasTag(\"place\")",
+  "views": [
+    {
+      "type": "map",
+      "name": "Map",
+      "order": ["file.name", "rating"],
+      "coordinates": "note.coordinates",
+      "markerIcon": "note.icon",
+      "markerColor": "note.color",
+      "defaultZoom": 12
+    },
+    {
+      "type": "table",
+      "name": "All Places",
+      "order": ["file.name", "rating"],
+      "sort": [{ "property": "rating", "direction": "DESC" }]
+    }
+  ]
+}
+```
+
+Which produces:
+
+```yaml
+filters: file.hasTag("place")
+views:
+- type: map
+  name: Map
+  order:
+  - file.name
+  - rating
+  coordinates: note.coordinates
+  markerIcon: note.icon
+  markerColor: note.color
+  defaultZoom: 12
+- type: table
+  name: All Places
+  order:
+  - file.name
+  - rating
+  sort:
+  - property: rating
+    direction: DESC
+```
+
+---
+
 ## Updating a base
 
 `update_base` merges into the existing file — it does not overwrite the whole thing.

@@ -382,6 +382,45 @@ def test_get_corrupted_base():
         return False
 
 
+def test_map_base_roundtrips():
+    """A real map view (Maps plugin keys) validates and round-trips."""
+    try:
+        with tempfile.TemporaryDirectory() as temp_vault:
+            client = ObsidianVaultClient(temp_vault)
+            data = {
+                "filters": 'file.hasTag("place")',
+                "views": [
+                    {
+                        "type": "map",
+                        "name": "Map",
+                        "order": ["file.name", "rating"],
+                        "coordinates": "note.coordinates",
+                        "markerIcon": "note.icon",
+                        "markerColor": "note.color",
+                        "defaultZoom": 12,
+                        "mapTiles": "https://tiles.example.com/{z}/{x}/{y}.png",
+                    }
+                ],
+            }
+
+            base = client.create_base("Bases/Places.base", data)
+            if base["parse_error"] is not None:
+                raise AssertionError(f"Unexpected parse error: {base['parse_error']}")
+            if base["views"] != ["Map"]:
+                raise AssertionError(f"View names mismatch: {base['views']}")
+
+            view = client.get_base("Bases/Places.base")["data"]["views"][0]
+            for key in ("coordinates", "markerIcon", "markerColor", "defaultZoom", "mapTiles"):
+                if view.get(key) != data["views"][0][key]:
+                    raise AssertionError(f"Round-trip lost map key '{key}': {view.get(key)}")
+
+        print("✅ Map view (Maps plugin keys) validates and round-trips")
+        return True
+    except Exception as e:
+        print(f"❌ ERROR: Failed map-base round-trip test: {e}")
+        return False
+
+
 def run_all_tests():
     """Run all tests."""
     print("🔍 Testing Obsidian MCP Server")
@@ -400,6 +439,7 @@ def run_all_tests():
         ("Bases: Read-Only Refuses", test_base_read_only),
         ("Bases: Path Safety", test_base_path_traversal),
         ("Bases: Corrupted File", test_get_corrupted_base),
+        ("Bases: Map Round-Trip", test_map_base_roundtrips),
     ]
     
     passed = 0

@@ -43,6 +43,17 @@ VIEW_KEYS = {
     "imageAspectRatio",
     "imageFit",
     "rowHeight",
+    # map-view keys written by the Maps community plugin:
+    "coordinates",
+    "markerIcon",
+    "markerColor",
+    "defaultZoom",
+    "center",
+    "minZoom",
+    "maxZoom",
+    "mapHeight",
+    "mapTiles",
+    "mapTilesDark",
 }
 
 FILTER_LOGIC_KEYS = {"and", "or", "not"}

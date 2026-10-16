@@ -133,13 +133,18 @@ class ObsidianVaultClient:
         
         try:
             content, metadata = self._load_markdown(note_path)
+            content = content or ''
             tags = sorted(set(self._normalize_tags(metadata.get('tags')) + self._extract_inline_tags(content)))
+            # An empty 'title:' (common in templates) parses as None; a number or
+            # date parses as non-str. Fall back to the file name, always a string.
+            title = metadata.get('title')
+            title = str(title).strip() if title is not None else ''
             
             return {
                 'path': str(note_path.relative_to(self.vault_path)),
                 'content': content,
                 'metadata': metadata,
-                'title': metadata.get('title', note_path.stem),
+                'title': title or note_path.stem,
                 'tags': tags,
                 'created': metadata.get('created'),
                 'modified': metadata.get('modified')
@@ -223,8 +228,8 @@ class ObsidianVaultClient:
         
         query_lower = query.lower()
         for note in notes:
-            if (query_lower in note['title'].lower() or 
-                query_lower in note['content'].lower() or
+            if (query_lower in (note.get('title') or '').lower() or
+                query_lower in (note.get('content') or '').lower() or
                 query_lower in ' '.join(str(tag) for tag in note.get('tags', [])).lower()):
                 results.append(note)
         
@@ -251,7 +256,7 @@ class ObsidianVaultClient:
             if note['path'] == path:
                 continue
 
-            content = note['content']
+            content = note.get('content') or ''
 
             for target, alias in WIKILINK_RE.findall(content):
                 link_target = target.split('#')[0].strip()  # Remove header references
@@ -270,7 +275,7 @@ class ObsidianVaultClient:
         if not note:
             return []
         
-        content = note['content']
+        content = note.get('content') or ''
 
         links = []
         for target, _alias in WIKILINK_RE.findall(content):

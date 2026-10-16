@@ -421,6 +421,55 @@ def test_map_base_roundtrips():
         return False
 
 
+def test_empty_title_and_content():
+    """Empty 'title:', no frontmatter, and empty content must not break search."""
+    try:
+        with tempfile.TemporaryDirectory() as temp_vault:
+            templates = os.path.join(temp_vault, "Templates")
+            os.makedirs(templates)
+            with open(os.path.join(templates, "capture.md"), "w", encoding="utf-8") as f:
+                f.write("---\ntitle:\ntags:\n---\n\nA capture note template. See [[Plain]].\n")
+            with open(os.path.join(temp_vault, "Plain.md"), "w", encoding="utf-8") as f:
+                f.write("Just a plain note, no frontmatter.\n")
+            with open(os.path.join(temp_vault, "Empty.md"), "w", encoding="utf-8") as f:
+                f.write("")
+            with open(os.path.join(temp_vault, "Numbered.md"), "w", encoding="utf-8") as f:
+                f.write("---\ntitle: 2026\n---\n\nYear note.\n")
+
+            client = ObsidianVaultClient(temp_vault)
+
+            titles = {n["path"]: n["title"] for n in client.list_notes()}
+            expected = {
+                os.path.join("Templates", "capture.md"): "capture",
+                "Plain.md": "Plain",
+                "Empty.md": "Empty",
+                "Numbered.md": "2026",
+            }
+            if titles != expected:
+                raise AssertionError(f"Titles mismatch: {titles}")
+
+            found = {n["path"] for n in client.search_notes("note")}
+            if found != {os.path.join("Templates", "capture.md"), "Plain.md", "Numbered.md"}:
+                raise AssertionError(f"search_notes('note') returned {found}")
+            if {n["path"] for n in client.search_notes("capture")} != {os.path.join("Templates", "capture.md")}:
+                raise AssertionError("Title fallback is not searchable")
+            if [n["path"] for n in client.search_notes("2026")] != ["Numbered.md"]:
+                raise AssertionError("Numeric title is not searchable")
+
+            client.get_tags()
+            if client.get_note_links("Empty.md") != []:
+                raise AssertionError("Empty note should have no links")
+            backlinks = client.get_backlinks("Plain.md")
+            if [b["note"]["path"] for b in backlinks] != [os.path.join("Templates", "capture.md")]:
+                raise AssertionError(f"Backlinks mismatch: {backlinks}")
+
+        print("✅ Empty title, no frontmatter and empty content are handled")
+        return True
+    except Exception as e:
+        print(f"❌ ERROR: Failed empty title/content test: {e}")
+        return False
+
+
 def run_all_tests():
     """Run all tests."""
     print("🔍 Testing Obsidian MCP Server")
@@ -440,6 +489,7 @@ def run_all_tests():
         ("Bases: Path Safety", test_base_path_traversal),
         ("Bases: Corrupted File", test_get_corrupted_base),
         ("Bases: Map Round-Trip", test_map_base_roundtrips),
+        ("Empty Title / Content", test_empty_title_and_content),
     ]
     
     passed = 0

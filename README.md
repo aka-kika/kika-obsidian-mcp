@@ -7,6 +7,7 @@
 [![Works with](https://img.shields.io/badge/works%20with-any%20MCP%20client-111827)](#configure-your-mcp-client)
 [![Local first](https://img.shields.io/badge/local--first-markdown-10B981)](#safety-features)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/aka-kika/kika-obsidian-mcp)
 
 Local-first MCP server for working with an Obsidian vault.
 
